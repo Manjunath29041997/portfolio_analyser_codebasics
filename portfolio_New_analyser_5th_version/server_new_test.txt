@@ -1,0 +1,14 @@
+
+> analyser@0.1.0 dev
+> cross-env NEXT_DISABLE_TURBOPACK=1 next dev --hostname 127.0.0.1
+
+⚠ Port 3000 is in use by process 41412, using available port 3001 instead.
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://127.0.0.1:3001
+- Network:       http://127.0.0.1:3001
+- Environments: .env.local
+
+✓ Starting...
+⨯ Unable to acquire lock at C:\Users\paima\Downloads\portfolio_analyser_V5\portfolio_New_analyser_5th_version\.next\dev\lock, is another instance of next dev running?
+  Suggestion: If you intended to restart next dev, terminate the other process, and then try again.
+[?25h

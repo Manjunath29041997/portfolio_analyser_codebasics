@@ -1,0 +1,192 @@
+{
+  "overall_score": 92,
+  "sections": [
+    {
+      "name": "Profile Photo",
+      "score": 10,
+      "max_score": 10,
+      "suggestions": [
+        "Looks good."
+      ],
+      "input_data": "https://images.codebasics.io/uploads/learner-portfolio/profile-images/58204/670d2eb67664e/8774b3e15f.png"
+    },
+    {
+      "name": "About Me",
+      "score": 12,
+      "max_score": 15,
+      "suggestions": [
+        "ROLE: Target role is clearly named, but 'Data Aspirant' is a bit vague.",
+        "TOOLS: Specific tools named, but 'SQL' and 'Excel' are mentioned, but not 'PowerBI' which is listed under key skills.",
+        "DOMAIN: Industry or domain is not explicitly stated."
+      ],
+      "input_data": "Hi! I’m Rachana Hadke, an aspiring data analyst who loves finding the stories in numbers. _x000D_\nI focus on turning raw data into useful insights that help make smarter and quicker decisions._x000D_\n_x000D_\nWhether I’m diving into complex datasets or crafting visually compelling dashboards, I thrive on solving real-world problems with data. _x000D_\nI’ve worked on projects across finance, retail, and sports, where I’ve helped identify trends and improve strategies using data._x000D_\n_x000D_\nI’m also a lifelong learner—constantly upskilling through certifications and challenging projects, pushing the boundaries of what data can achieve. _x000D_\nIf you’re looking for someone who can not only analyze data but transform it into a competitive advantage, let’s connect!"
+    },
+    {
+      "name": "Experience",
+      "score": 15,
+      "max_score": 20,
+      "suggestions": [
+        "ROLE: Responsibilities and ownership are clearly described, but 'Data-Driven Operations' is not a specific role.",
+        "TOOLS: Specific tools named with context of how they were used, but 'SQL' and 'Excel' are mentioned, but not 'PowerBI' which is listed under key skills.",
+        "IMPACT: A business outcome is stated, but 'significantly improving service reliability' is not a measurable result.",
+        "NUMBERS: At least one measurable result is not present."
+      ],
+      "input_data": "Analyst - Capgemini, Mumbai\nNov 2020 - Dec 2022\nData-Driven Operations\n: Analyzed and resolved over 2 incidents per day. Used SQL and Excel to identify patterns to prevent future issues, significantly improving service reliability.\nCollaboration & Communication\n: Worked closely with the development and operations teams to analyze system performance, share insights, and implement data-driven solutions to improve business outcomes."
+    },
+    {
+      "name": "Key Skills",
+      "score": 10,
+      "max_score": 10,
+      "suggestions": [
+        "Well done!"
+      ],
+      "input_data": "Excel, PowerBI, Effective Communcation, Stakeholder Management, Problem Solving"
+    },
+    {
+      "name": "Projects",
+      "score": 45,
+      "max_score": 45,
+      "suggestions": [
+        {
+          "project_id": 6204,
+          "project_title": "Sales Analytics",
+          "score": 45,
+          "short_info": {
+            "score": 15,
+            "suggestion": "Looks good."
+          },
+          "full_description": {
+            "score": 30,
+            "suggestion": "Looks good."
+          },
+          "breakdown": {
+            "short_info": {
+              "score": 15,
+              "suggestion": "Looks good."
+            },
+            "full_description": {
+              "score": 30,
+              "suggestion": "Looks good."
+            }
+          }
+        },
+        {
+          "project_id": 6205,
+          "project_title": "Business Insights 360",
+          "score": 45,
+          "short_info": {
+            "score": 15,
+            "suggestion": "Looks good."
+          },
+          "full_description": {
+            "score": 30,
+            "suggestion": "Looks good."
+          },
+          "breakdown": {
+            "short_info": {
+              "score": 15,
+              "suggestion": "Looks good."
+            },
+            "full_description": {
+              "score": 30,
+              "suggestion": "Looks good."
+            }
+          }
+        },
+        {
+          "project_id": 6206,
+          "project_title": "Sports Insights",
+          "score": 45,
+          "short_info": {
+            "score": 15,
+            "suggestion": "Looks good."
+          },
+          "full_description": {
+            "score": 30,
+            "suggestion": "Looks good."
+          },
+          "breakdown": {
+            "short_info": {
+              "score": 15,
+              "suggestion": "Looks good."
+            },
+            "full_description": {
+              "score": 30,
+              "suggestion": "Looks good."
+            }
+          }
+        },
+        {
+          "project_id": 6209,
+          "project_title": "Promotion Effectiveness Insights",
+          "score": 45,
+          "short_info": {
+            "score": 15,
+            "suggestion": "Looks good."
+          },
+          "full_description": {
+            "score": 30,
+            "suggestion": "Looks good."
+          },
+          "breakdown": {
+            "short_info": {
+              "score": 15,
+              "suggestion": "Looks good."
+            },
+            "full_description": {
+              "score": 30,
+              "suggestion": "Looks good."
+            }
+          }
+        },
+        {
+          "project_id": 6694,
+          "project_title": "Data analysis in Hospitality Domain using Python",
+          "score": 45,
+          "short_info": {
+            "score": 15,
+            "suggestion": "Looks good."
+          },
+          "full_description": {
+            "score": 30,
+            "suggestion": "Looks good."
+          },
+          "breakdown": {
+            "short_info": {
+              "score": 15,
+              "suggestion": "Looks good."
+            },
+            "full_description": {
+              "score": 30,
+              "suggestion": "Looks good."
+            }
+          }
+        },
+        {
+          "project_id": 6927,
+          "project_title": "Data analysis in consumer goods domain using SQL",
+          "score": 45,
+          "short_info": {
+            "score": 15,
+            "suggestion": "Looks good."
+          },
+          "full_description": {
+            "score": 30,
+            "suggestion": "Looks good."
+          },
+          "breakdown": {
+            "short_info": {
+              "score": 15,
+              "suggestion": "Looks good."
+            },
+            "full_description": {
+              "score": 30,
+              "suggestion": "Looks good."
+            }
+          }
+        }
+      ],
+      "input_data": "Sales Analytics, Business Insights 360, Sports Insights, Promotion Effectiveness Insights, Data analysis in Hospitality Domain using Python, Data analysis in consumer goods domain using SQL"
+    }
+  ]
+}
