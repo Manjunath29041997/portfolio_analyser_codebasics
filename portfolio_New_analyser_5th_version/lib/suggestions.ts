@@ -4,8 +4,6 @@
  * Never let the model generate these — that was the root cause of rotation drift and rephrasing.
  */
 
-/** Rendered as "Well done!" (green) + Common Patterns tip line (black) */
-export const WELL_DONE_WITH_TIP = '__WELL_DONE_TIP__';
 
 /** Static message: below 5 skills AND no soft skill */
 export const KEY_SKILLS_MIX_SUGGESTION = 'Add 3 more skills, a mix of technical and soft skills relevant to your target role.';

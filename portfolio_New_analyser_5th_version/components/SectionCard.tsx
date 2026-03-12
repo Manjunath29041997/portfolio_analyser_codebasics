@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { ChevronDown, Info, LucideIcon } from 'lucide-react';
 
-const WELL_DONE = 'Well done!';
-const WELL_DONE_WITH_TIP = '__WELL_DONE_TIP__';
-
-const isWellDoneVariant = (s: any) =>
-    String(s).trim() === WELL_DONE || String(s).trim() === WELL_DONE_WITH_TIP;
+const WELL_DONE = 'Well done! All key elements found.';
+const isWellDoneVariant = (s: any) => {
+    const str = String(s).trim();
+    return str === WELL_DONE || str === 'Well done!' || str === '__WELL_DONE_TIP__';
+};
 
 const SECTION_CRITERIA: Record<string, { headline: string; tags: string[] }> = {
     'About Me': {
@@ -175,15 +175,15 @@ export default function SectionCard({ name, score, max_score, suggestions, input
                                                         <span className="font-bold text-[9px] text-gray-400 tracking-tight block mb-2 border-b border-gray-100 pb-1">Project Short Info</span>
                                                         <div className="space-y-2.5">
                                                             {project.breakdown?.short_info?.suggestions?.length > 0 &&
-                                                                project.breakdown.short_info.suggestions.some((s: string) => s !== WELL_DONE) ? (
-                                                                project.breakdown.short_info.suggestions.filter((s: string) => s !== WELL_DONE).map((s: string, i: number) => (
+                                                                project.breakdown.short_info.suggestions.some((s: string) => !isWellDoneVariant(s)) ? (
+                                                                project.breakdown.short_info.suggestions.filter((s: string) => !isWellDoneVariant(s)).map((s: string, i: number) => (
                                                                     <div key={i} className="flex gap-3 text-[10px] bg-white border border-gray-100 rounded-xl p-2 shadow-sm">
                                                                         <span className="text-orange-500 font-black shrink-0 mt-0.5">•</span>
                                                                         <span className="text-brand-navy/90 leading-relaxed font-sans">{s}</span>
                                                                     </div>
                                                                 ))
                                                             ) : (
-                                                                <p className="text-[10px] text-green-600 font-medium italic px-1">Well done!</p>
+                                                                <p className="text-[10px] text-green-600 font-bold italic font-sans px-1">{WELL_DONE}</p>
                                                             )}
                                                         </div>
                                                     </div>
@@ -192,9 +192,8 @@ export default function SectionCard({ name, score, max_score, suggestions, input
                                                     <div>
                                                         <span className="font-bold text-[9px] text-gray-400 tracking-tight block mb-2 border-b border-gray-100 pb-1">Project Description</span>
                                                         <div className="space-y-2.5">
-                                                            {(() => {
-                                                                const fullSugs = project.breakdown?.full_description?.suggestions ?? [];
-                                                                const hasRealFullSug = fullSugs.some((s: string) => s !== WELL_DONE);
+                                                            {(() => {                                                                const fullSugs = project.breakdown?.full_description?.suggestions ?? [];
+                                                                const hasRealFullSug = fullSugs.some((s: string) => !isWellDoneVariant(s));
                                                                 const assets = project.breakdown?.assets;
                                                                 const hasMissingAsset = assets && (
                                                                     !assets.video_present ||
@@ -204,7 +203,7 @@ export default function SectionCard({ name, score, max_score, suggestions, input
 
                                                                 if (hasRealFullSug) {
                                                                     // Has actual suggestions — show them
-                                                                    return fullSugs.filter((s: string) => s !== WELL_DONE).map((s: string, i: number) => (
+                                                                    return fullSugs.filter((s: string) => !isWellDoneVariant(s)).map((s: string, i: number) => (
                                                                         <div key={i} className="flex gap-3 text-[10px] bg-white border border-gray-100 rounded-xl p-2 shadow-sm">
                                                                             <span className="text-orange-500 font-black shrink-0 mt-0.5">•</span>
                                                                             <span className="text-brand-navy/90 leading-relaxed font-sans">{s}</span>
@@ -221,7 +220,7 @@ export default function SectionCard({ name, score, max_score, suggestions, input
                                                                     );
                                                                 }
                                                                 // All good
-                                                                return <p className="text-[10px] text-green-600 font-medium italic px-1">Well done!</p>;
+                                                                return <p className="text-[10px] text-green-600 font-bold italic font-sans px-1">{WELL_DONE}</p>;
                                                             })()}
                                                         </div>
                                                     </div>
@@ -268,13 +267,6 @@ export default function SectionCard({ name, score, max_score, suggestions, input
                                 {(suggestions.length === 0 || suggestions.every(s => isWellDoneVariant(s))) && (
                                     <div className="py-4 px-1 text-center">
                                         <p className="text-xs text-green-600 font-bold italic font-sans tracking-wide">Well done! All key elements found.</p>
-                                        {suggestions.some(s => String(s).trim() === WELL_DONE_WITH_TIP) && (
-                                            <p className="text-[11px] text-brand-navy/75 font-normal font-sans mt-1.5 leading-relaxed">
-                                                Refer to the{' '}
-                                                <strong className="text-brand-navy font-bold">Common Patterns in Winning Portfolios</strong>
-                                                {' '}section to enhance it further.
-                                            </p>
-                                        )}
                                     </div>
                                 )}
                             </ul>

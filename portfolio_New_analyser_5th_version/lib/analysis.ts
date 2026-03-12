@@ -7,7 +7,6 @@ import {
     LEARNING_SUGGESTIONS,
     ABOUT_SUGGESTIONS,
     EXPERIENCE_SUGGESTIONS,
-    WELL_DONE_WITH_TIP,
     KEY_SKILLS_MIX_SUGGESTION,
     KEY_SKILLS_TECHNICAL_SUGGESTION,
     KEY_SKILLS_SOFT_SUGGESTION,
@@ -40,7 +39,7 @@ export interface AnalysisResult {
 }
 
 const BASE_IMAGE_URL = 'https://images.codebasics.io/';
-const WELL_DONE = 'Well done!';
+const WELL_DONE = 'Well done! All key elements found.';
 
 // ─────────────────────────────────────────────────────────
 // Phase 1: Text sanitizer — kills _x000D_, \r, and extra whitespace
@@ -103,8 +102,9 @@ function buildAboutSuggestions(apiResult: any): { score: number; suggestions: st
 
     const isWellDone = finalSuggestions.length === 1 && finalSuggestions[0] === WELL_DONE;
     return {
-        score: isWellDone ? 15 : Math.min(15, rawScore),
-        suggestions: isWellDone ? [WELL_DONE_WITH_TIP] : finalSuggestions
+        // Cap at 14/15 — no section shows perfect score
+        score: isWellDone ? 14 : Math.min(14, rawScore),
+        suggestions: isWellDone ? [WELL_DONE] : finalSuggestions
     };
 }
 
@@ -128,8 +128,9 @@ function buildExperienceSuggestions(apiResult: any): { score: number; suggestion
 
     const isWellDone = finalSuggestions.length === 1 && finalSuggestions[0] === WELL_DONE;
     return {
-        score: isWellDone ? 15 : Math.min(15, rawScore),
-        suggestions: isWellDone ? [WELL_DONE_WITH_TIP] : finalSuggestions
+        // Cap at 14/15 — no section shows perfect score
+        score: isWellDone ? 14 : Math.min(14, rawScore),
+        suggestions: isWellDone ? [WELL_DONE] : finalSuggestions
     };
 }
 
@@ -144,8 +145,8 @@ function buildKeySkillsSuggestions(apiResult: any, keySkillsList: string[]): { s
 
     // ── 4-case matrix ──────────────────────────────────────
     if (!belowThreshold && !missingSoftSkill) {
-        // ≥5 skills AND has soft skill → full marks
-        return { score: 10, suggestions: [WELL_DONE] };
+        // ≥5 skills AND has soft skill → 9/10 marks
+        return { score: 9, suggestions: [WELL_DONE] };
     }
 
     const rawScore = getScore(apiResult?.score);
@@ -162,6 +163,11 @@ function buildKeySkillsSuggestions(apiResult: any, keySkillsList: string[]): { s
 
     // ≥5 skills but no soft skill → soft skill message
     return { score: Math.min(8, rawScore), suggestions: [KEY_SKILLS_SOFT_SUGGESTION] };
+}
+
+// Helper to cap project scores to 53/60 (7 points deduction)
+function capProjectScore(score: number): number {
+    return Math.min(53, score);
 }
 
 // ─────────────────────────────────────────────────────────
@@ -186,46 +192,55 @@ function buildProjectSuggestions(
     const fullDesc = projectApiResult?.full_description ?? {};
     const flags = fullDesc?.flags ?? {};
 
-    // Short description — use & advance its own counter
+    // ── Short Info scoring (max 15) ──────────────────────────────────────
+    // 0 flags fired → 15 pts | needs_suggestion fires → 0 pts
     let shortSuggestions: string[];
+    let shortScore: number;
     if (shortDesc.needs_suggestion) {
         shortSuggestions = [SHORT_DESC_SUGGESTIONS[counters.shortDesc % SHORT_DESC_SUGGESTIONS.length]];
         counters.shortDesc++;
+        shortScore = 0;
     } else {
         shortSuggestions = [WELL_DONE];
+        shortScore = 15;
     }
 
-    // Full description — each category has its own counter
+    // ── Full Description scoring (max 15) ────────────────────────────────
+    // Each flag fired deducts 5 pts: 0 flags=15, 1 flag=10, 2 flags=5, 3 flags=0
     const fullSuggestions: string[] = [];
+    let fullFlagsCount = 0;
+
     if (flags.needs_tools) {
         fullSuggestions.push(TOOLS_SUGGESTIONS[counters.tools % TOOLS_SUGGESTIONS.length]);
         counters.tools++;
+        fullFlagsCount++;
     }
     if (flags.needs_impact) {
         fullSuggestions.push(IMPACT_SUGGESTIONS[counters.impact % IMPACT_SUGGESTIONS.length]);
         counters.impact++;
+        fullFlagsCount++;
     }
     if (flags.needs_learning) {
         fullSuggestions.push(LEARNING_SUGGESTIONS[counters.learning % LEARNING_SUGGESTIONS.length]);
         counters.learning++;
+        fullFlagsCount++;
     }
     if (fullSuggestions.length === 0) fullSuggestions.push(WELL_DONE);
 
-    const shortScore = getScore(shortDesc.score);
-    const fullScore = getScore(fullDesc.score);
-    let totalScore = getScore(projectApiResult?.score) || (shortScore + fullScore);
+    const fullScore = Math.max(0, 15 - fullFlagsCount * 5);
 
-    // Scoring for assets: +10 each for video, linkedin, github (total 30 pts)
+    // ── Asset scoring (max 30) ───────────────────────────────────────────
+    // +10 each for video, LinkedIn post, GitHub link
     const assetScore = (originalProject.video_present ? 10 : 0) +
         (originalProject.linkedin_post_present ? 10 : 0) +
         (originalProject.github_link_present ? 10 : 0);
 
-    totalScore += assetScore;
+    // ── Total (max 60 raw, capped at 53)
+    const totalScore = capProjectScore(shortScore + fullScore + assetScore);
 
     return {
         project_title: originalProject.project_title || `Project ${projectIndex + 1}`,
-        // Cap at 59 — projects never show full marks (always room to improve)
-        score: Math.min(59, totalScore),
+        score: totalScore,
         breakdown: {
             short_info: { suggestions: shortSuggestions },
             full_description: { suggestions: fullSuggestions },
@@ -367,7 +382,7 @@ export async function analyzePortfolio(learner: any): Promise<AnalysisResult> {
     ];
 
     const rawTotal = sections.reduce((acc, s) => acc + s.score, 0);
-    const overall_score = Math.min(90, Math.round(rawTotal));
+    const overall_score = Math.round(rawTotal);
 
     const what_was_analyzed: WhatWasAnalyzed = {
         full_name: cleanLearner.full_name || 'Unknown',

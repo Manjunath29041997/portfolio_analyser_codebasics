@@ -127,9 +127,20 @@ export default function Sidebar({ data, isLoading, error, onClose, onReAnalyse }
                                 </div>
                             </div>
 
-                            <p className="mt-5 text-[11px] text-gray-400 font-sans leading-snug text-center px-8">
-                                Every improvement you make in your portfolio increases your probability of getting hired.
-                            </p>
+                            {score === 90 ? (
+                                <div className="mt-5 flex flex-col items-center gap-1 animate-in fade-in zoom-in-95 duration-700">
+                                    <p className="text-[14px] text-brand-teal leading-none text-center">
+                                        That&apos;s an impressive score!
+                                    </p>
+                                    <p className="text-[14px] text-brand-teal leading-none text-center">
+                                        You&apos;re ready to apply for jobs
+                                    </p>
+                                </div>
+                            ) : (
+                                <p className="mt-5 text-[11px] text-gray-400 font-sans leading-snug text-center px-8">
+                                    Every improvement you make in your portfolio increases your probability of getting hired.
+                                </p>
+                            )}
                         </div>
 
                         {/* Sections List Headline */}
