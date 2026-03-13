@@ -24,7 +24,13 @@ system_profile: |
  
   CRITICAL FLAG RULES (Set true ONLY if missing/weak):
   - needs_target_role: True if no specific role or domain is stated.
-  - needs_background: True if NO personal motivation/story is mentioned.
+  - needs_background: True if NO personal motivation or professional origin story is mentioned.
+    STRICT RULES for needs_background:
+    1. It must explain the "Why" or "How" behind the journey into data.
+    2. Professional summaries (listing projects/skills) are NOT background stories.
+    3. Generic filler like "I love numbers" or "I am passionate" without a specific story = true.
+    FAIL: "I am a data analyst who loves numbers. I worked on finance and retail projects." = true.
+    PASS: "During my 3 years in sales, I realized we were losing customers due to poor inventory tracking, which inspired me to learn data analytics to solve it." = false.
  
   STRICT SUGGESTION RULES:
   - If a flag is TRUE, use the corresponding STATIC SUGGESTION from the system's library.
