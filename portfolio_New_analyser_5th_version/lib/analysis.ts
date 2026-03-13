@@ -40,6 +40,7 @@ export interface AnalysisResult {
 
 const BASE_IMAGE_URL = 'https://images.codebasics.io/';
 const WELL_DONE = 'Well done! All key elements found.';
+const DOMAIN_CORRECT = 'Your mentioned project domain is correct.';
 
 // ─────────────────────────────────────────────────────────
 // Phase 1: Text sanitizer — kills _x000D_, \r, and extra whitespace
@@ -192,8 +193,7 @@ function buildProjectSuggestions(
     const fullDesc = projectApiResult?.full_description ?? {};
     const flags = fullDesc?.flags ?? {};
 
-    // ── Short Info scoring (max 15) ──────────────────────────────────────
-    // 0 flags fired → 15 pts | needs_suggestion fires → 0 pts
+    // ── Short Info scoring (max 10) ──────────────────────────────────────
     let shortSuggestions: string[];
     let shortScore: number;
     if (shortDesc.needs_suggestion) {
@@ -202,7 +202,21 @@ function buildProjectSuggestions(
         shortScore = 0;
     } else {
         shortSuggestions = [WELL_DONE];
-        shortScore = 15;
+        shortScore = 10;
+    }
+
+    // ── Project Domain scoring (max 5) ───────────────────────────────────
+    const domainData = projectApiResult?.project_domain ?? {};
+    let domainSuggestions: string[];
+    let domainScore: number;
+    if (domainData.is_correct) {
+        domainSuggestions = [DOMAIN_CORRECT];
+        domainScore = 5;
+    } else {
+        const suggested = domainData.suggested_domain || 'Unknown';
+        const learner = originalProject.project_domain || '(not provided)';
+        domainSuggestions = [`Your project domain should be '${suggested}' not '${learner}' as per your project title.`];
+        domainScore = 0;
     }
 
     // ── Full Description scoring (max 15) ────────────────────────────────
@@ -236,13 +250,14 @@ function buildProjectSuggestions(
         (originalProject.github_link_present ? 10 : 0);
 
     // ── Total (max 60 raw, capped at 53)
-    const totalScore = capProjectScore(shortScore + fullScore + assetScore);
+    const totalScore = capProjectScore(shortScore + domainScore + fullScore + assetScore);
 
     return {
         project_title: originalProject.project_title || `Project ${projectIndex + 1}`,
         score: totalScore,
         breakdown: {
             short_info: { suggestions: shortSuggestions },
+            project_domain: { suggestions: domainSuggestions },
             full_description: { suggestions: fullSuggestions },
             assets: {
                 video_present: !!originalProject.video_present,
@@ -302,6 +317,8 @@ export async function analyzePortfolio(learner: any): Promise<AnalysisResult> {
         try {
             const projectUserPrompt = interpolate(config.user_project, {
                 position: cleanLearner.position || 'Data Professional',
+                project_title: p.project_title || '(not provided)',
+                project_domain: p.project_domain || '(not provided)',
                 short_description: p.short_description ?? p.project_short_description ?? '(not provided)',
                 description: p.description ?? p.full_description ?? p.project_full_description ?? '(not provided)',
             });

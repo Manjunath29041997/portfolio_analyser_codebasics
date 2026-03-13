@@ -106,12 +106,22 @@ system_project: |
   Evaluate ONE project and return ONLY valid JSON with scores and boolean need-flags.
   Score ONLY what is explicitly written. Never infer or assume.
 
-  SHORT_DESCRIPTION (max 15):
+  SHORT_DESCRIPTION (max 10):
     Score from:
-      objective_clarity : 0–13  (business problem/objective clearly and specifically stated?)
+      objective_clarity : 0–8   (business problem/objective clearly and specifically stated?)
       writing_quality   : 0–2   (clear, professional, no emojis?)
     Flag:
-      needs_suggestion : true if objective is missing, vague, or generic
+      needs_suggestion : true if objective is missing, vague, or generic.
+      NOTE: Stating ONLY the data source or name (e.g., "Kaggle data") is generic.
+
+  PROJECT_DOMAIN (max 5):
+    Compare learner's project_domain with the project_title.
+    STRICT RULES:
+    1. The domain MUST be a recognized professional business category (e.g. Retail, Sales, Supply Chain, Finance, Marketing, HR, Healthcare, E-commerce).
+    2. Literal repetitions or verbatim keyword matches from the title (e.g. "Customer Shopping" for "Customer Shopping Dataset") are UNACCEPTABLE.
+    3. If the domain is just a restatement of the project title keywords, mark is_correct: false.
+    - correct_domain : The domain name is professional and accurately categorizes the project's industry context.
+    - suggested_domain : If incorrect, provide ONLY the correct professional category name (e.g. "Retail").
 
   FULL_DESCRIPTION (max 15):
     Score each criterion:
@@ -130,14 +140,23 @@ system_project: |
     "I learned a lot" with no specifics = needs_learning: true
   - needs_impact: Set true ONLY if there are no numbers, percentages, or measurable outcomes.
   - needs_tools: Set true ONLY if tools are completely absent OR only generically named without any context.
+  - needs_suggestion: Set true if the description only states the data source or name of the project.
+    It MUST explain the business objective or the problem being solved.
+    FAIL: "Analyzes Kaggle data for shopping malls" = needs_suggestion: true.
+    PASS: "Identified high-value customer segments to optimize marketing spend" = needs_suggestion: false.
 
-  OUTPUT:
+  OUTPUT SCHEMA:
   {
-    "score": <short_description.score + full_description.score>,
+    "score": <short_description.score + project_domain.score + full_description.score>,
     "short_description": {
-      "score": 0–15,
-      "breakdown": { "objective_clarity": 0–13, "writing_quality": 0–2 },
+      "score": 0–10,
+      "breakdown": { "objective_clarity": 0–8, "writing_quality": 0–2 },
       "needs_suggestion": true|false
+    },
+    "project_domain": {
+      "score": 0–5,
+      "is_correct": bool,
+      "suggested_domain": "string"
     },
     "full_description": {
       "score": 0–15,
@@ -154,5 +173,7 @@ user_profile: |
 user_project: |
   Evaluate this single project for a {{position}}.
   Return JSON only.
+  Project Title: {{project_title}}
+  Project Domain: {{project_domain}}
   Short description: {{short_description}}
   Full description: {{description}}

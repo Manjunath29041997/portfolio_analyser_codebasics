@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import { ChevronDown, Info, LucideIcon } from 'lucide-react';
 
 const WELL_DONE = 'Well done! All key elements found.';
+const DOMAIN_CORRECT = 'Your mentioned project domain is correct.';
+
 const isWellDoneVariant = (s: any) => {
     const str = String(s).trim();
-    return str === WELL_DONE || str === 'Well done!' || str === '__WELL_DONE_TIP__';
+    return str === WELL_DONE || str === 'Well done!' || str === '__WELL_DONE_TIP__' || str === DOMAIN_CORRECT;
 };
 
 const SECTION_CRITERIA: Record<string, { headline: string; tags: string[] }> = {
@@ -24,7 +26,7 @@ const SECTION_CRITERIA: Record<string, { headline: string; tags: string[] }> = {
     },
     'Projects': {
         headline: 'Must Cover',
-        tags: ['Business Context', 'Impact', 'Learning'],
+        tags: ['Project Domain', 'Business Context', 'Impact', 'Learning'],
     },
     'Profile Photo': {
         headline: 'Must Cover',
@@ -36,17 +38,17 @@ function CriteriaBanner({ name }: { name: string }) {
     const criteria = SECTION_CRITERIA[name];
     if (!criteria) return null;
     return (
-        <div className="mt-4 mb-3 px-4 py-2 rounded-xl bg-brand-blue/[0.02] border border-brand-blue/10 flex items-center justify-start gap-x-3">
-            <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[11px] font-bold text-brand-blue font-display tracking-widest">
+        <div className="mt-4 mb-3 px-3 py-1.5 rounded-xl bg-brand-blue/[0.02] border border-brand-blue/10 flex items-center justify-start gap-x-2">
+            <div className="flex items-center gap-1.5 shrink-0">
+                <span className="text-[10px] font-bold text-brand-blue font-display tracking-widest">
                     {criteria.headline}
                 </span>
                 <span className="text-brand-blue/20 font-light text-xs ml-0.5">|</span>
             </div>
-            <div className="flex items-center gap-x-2.5 whitespace-nowrap overflow-visible">
+            <div className="flex items-center gap-x-2 whitespace-nowrap overflow-hidden">
                 {criteria.tags.map((tag, i) => (
                     <React.Fragment key={i}>
-                        <span className="text-[10px] text-brand-navy/70 font-sans font-medium tracking-tight">
+                        <span className="text-[9px] text-brand-navy/70 font-sans font-medium tracking-tight">
                             {tag}
                         </span>
                         {i < criteria.tags.length - 1 && (
@@ -170,6 +172,24 @@ export default function SectionCard({ name, score, max_score, suggestions, input
                                         {isProjectExpanded && (
                                             <div className="px-3 pb-3 border-t border-gray-50 pt-2 bg-slate-50/30 space-y-4">
                                                 <div className="space-y-4">
+                                                    {/* Project Domain */}
+                                                    <div>
+                                                        <span className="font-bold text-[9px] text-gray-400 tracking-tight block mb-2 border-b border-gray-100 pb-1">Project Domain</span>
+                                                        <div className="space-y-2.5">
+                                                            {project.breakdown?.project_domain?.suggestions?.length > 0 &&
+                                                                project.breakdown.project_domain.suggestions.some((s: string) => !isWellDoneVariant(s)) ? (
+                                                                project.breakdown.project_domain.suggestions.filter((s: string) => !isWellDoneVariant(s)).map((s: string, i: number) => (
+                                                                    <div key={i} className="flex gap-3 text-[10px] bg-white border border-gray-100 rounded-xl p-2 shadow-sm">
+                                                                        <span className="text-orange-500 font-black shrink-0 mt-0.5">•</span>
+                                                                        <span className="text-brand-navy/90 leading-relaxed font-sans">{s}</span>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <p className="text-[10px] text-green-600 font-bold italic font-sans px-1">{DOMAIN_CORRECT}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
                                                     {/* Short Info */}
                                                     <div>
                                                         <span className="font-bold text-[9px] text-gray-400 tracking-tight block mb-2 border-b border-gray-100 pb-1">Project Short Info</span>
@@ -192,7 +212,8 @@ export default function SectionCard({ name, score, max_score, suggestions, input
                                                     <div>
                                                         <span className="font-bold text-[9px] text-gray-400 tracking-tight block mb-2 border-b border-gray-100 pb-1">Project Description</span>
                                                         <div className="space-y-2.5">
-                                                            {(() => {                                                                const fullSugs = project.breakdown?.full_description?.suggestions ?? [];
+                                                            {(() => {
+                                                                const fullSugs = project.breakdown?.full_description?.suggestions ?? [];
                                                                 const hasRealFullSug = fullSugs.some((s: string) => !isWellDoneVariant(s));
                                                                 const assets = project.breakdown?.assets;
                                                                 const hasMissingAsset = assets && (
