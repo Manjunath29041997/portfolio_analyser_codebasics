@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Upload, User, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, User, ArrowRight, CheckCircle2, AlertCircle, Settings } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
+import AIConfiguration from '@/components/AIConfiguration';
+import DummyLandingScreen from '@/components/DummyLandingScreen';
 
 export default function PortfolioAnalyser() {
   const [portfolios, setPortfolios] = useState<any[]>([]);
@@ -10,7 +12,47 @@ export default function PortfolioAnalyser() {
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<'upload' | 'selection' | 'dashboard'>('upload');
+  const [view, setView] = useState<'landing' | 'config' | 'upload' | 'selection' | 'dashboard'>('landing');
+  const [aiConfig, setAiConfig] = useState<any>(null);
+
+  // Initialize from localStorage
+  React.useEffect(() => {
+    const saved = localStorage.getItem('ai_config');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setAiConfig(parsed);
+        // Do NOT change view here; let user stay on 'landing' initially.
+      } catch (e) {
+        console.error('Failed to parse saved config');
+      }
+    }
+  }, []);
+
+  const handleConfigSave = (config: any) => {
+    setAiConfig(config);
+    localStorage.setItem('ai_config', JSON.stringify(config));
+    setView('upload');
+  };
+
+  const handleTestAI = async (config: any) => {
+    try {
+      const response = await fetch('/api/test-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      });
+      return response.ok;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const handleRemoveConfig = () => {
+    setAiConfig(null);
+    localStorage.removeItem('ai_config');
+    setView('config');
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -49,7 +91,7 @@ export default function PortfolioAnalyser() {
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ learner }),
+        body: JSON.stringify({ learner, aiConfig }),
       });
 
       const data = await response.json();
@@ -65,23 +107,44 @@ export default function PortfolioAnalyser() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] flex flex-col items-center">
-      {/* Navbar / Logo */}
-      <nav className="w-full bg-white border-b border-gray-100 p-4 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-brand-blue rounded-lg flex items-center justify-center text-white font-black text-xl shadow-md">
-              C
+    <>
+      {view === 'landing' && (
+         <DummyLandingScreen 
+            onAnalyseClick={() => setView('config')} 
+         />
+      )}
+
+      {view !== 'landing' && (
+      <main className="min-h-screen bg-[#f8fafc] flex flex-col items-center">
+        {/* Navbar / Logo */}
+        {view !== 'config' && (
+        <nav className="w-full bg-white border-b border-gray-100 p-4 sticky top-0 z-10 shadow-sm">
+          <div className="max-w-6xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-brand-blue rounded-lg flex items-center justify-center text-white font-black text-xl shadow-md">
+                C
+              </div>
+              <span className="font-display text-lg tracking-tight font-black text-brand-navy">Portfolio Analyser</span>
             </div>
-            <span className="font-display text-lg tracking-tight font-black text-brand-navy">Portfolio Analyser</span>
+            <div className="px-3 py-1 bg-brand-blue/5 text-brand-blue text-[10px] font-black tracking-wide rounded-full border border-brand-blue/10 font-display">
+              v1.0 Demo
+            </div>
           </div>
-          <div className="px-3 py-1 bg-brand-blue/5 text-brand-blue text-[10px] font-black tracking-wide rounded-full border border-brand-blue/10 font-display">
-            v1.0 Demo
-          </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       <div className="flex-1 w-full max-w-5xl p-6 md:p-10 flex flex-col items-center">
+        {view === 'config' && (
+          <div className="w-full mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <AIConfiguration 
+              onSave={handleConfigSave} 
+              onTest={handleTestAI}
+              onRemove={handleRemoveConfig}
+              initialConfig={aiConfig}
+            />
+          </div>
+        )}
+
         {view === 'upload' && (
           <div className="w-full max-w-xl mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="text-center mb-10">
@@ -125,6 +188,16 @@ export default function PortfolioAnalyser() {
                 <span className="font-medium">{error}</span>
               </div>
             )}
+
+            <div className="mt-8 flex justify-center">
+              <button 
+                onClick={() => setView('config')}
+                className="text-[10px] font-black text-gray-400 hover:text-brand-blue uppercase tracking-widest font-display flex items-center gap-2 transition-colors"
+              >
+                <Settings size={12} />
+                Change AI Provider
+              </button>
+            </div>
 
             <div className="mt-12 grid grid-cols-3 gap-6">
               {[
@@ -252,5 +325,7 @@ export default function PortfolioAnalyser() {
         )}
       </div>
     </main>
+    )}
+    </>
   );
 }

@@ -3,13 +3,13 @@ import { analyzePortfolio } from '@/lib/analysis';
 
 export async function POST(req: NextRequest) {
     try {
-        const { learner } = await req.json();
+        const { learner, aiConfig } = await req.json();
 
         if (!learner) {
             return NextResponse.json({ error: 'Learner data is required' }, { status: 400 });
         }
 
-        const result = await analyzePortfolio(learner);
+        const result = await analyzePortfolio(learner, aiConfig);
         return NextResponse.json(result);
     } catch (error: any) {
         console.error('API Error:', error);

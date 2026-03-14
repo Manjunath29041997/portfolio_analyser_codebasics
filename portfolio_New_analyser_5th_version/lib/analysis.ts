@@ -1,5 +1,5 @@
 import { loadPrompts, interpolate } from './prompts';
-import { getChatCompletion } from './groq';
+import { getChatCompletion } from './ai';
 import {
     SHORT_DESC_SUGGESTIONS,
     TOOLS_SUGGESTIONS,
@@ -275,28 +275,23 @@ function buildProjectSuggestions(
 // ─────────────────────────────────────────────────────────
 // Main entry point
 // ─────────────────────────────────────────────────────────
-export async function analyzePortfolio(learner: any): Promise<AnalysisResult> {
+export async function analyzePortfolio(learner: any, aiConfig: any): Promise<AnalysisResult> {
     const config = loadPrompts();
-
-    // Phase 1: sanitize all learner data before any API call
     const cleanLearner = sanitizeText(learner);
+    console.log('--- Starting Portfolio Analysis ---');
 
-    console.log('--- ANALYSIS START ---');
-    console.log('Learner:', cleanLearner.full_name);
-
-    // ── Call B: Profile text (about + experience + key_skills) ──────────
-    console.log('Starting profile text analysis...');
-    const profileData = {
-        full_name: cleanLearner.full_name,
-        position: cleanLearner.position || 'Data Professional',
-        about: cleanLearner.about,
-        experience: cleanLearner.experience,
-        key_skills: cleanLearner.key_skills,
-    };
-    const profileUserPrompt = interpolate(config.user_profile, { data: JSON.stringify(profileData, null, 2) });
-    let profileResult: any = {};
+    // ── Call P (Profile Overview) ─────────────────────────────────────────
+    let profileResult: any = null;
     try {
-        profileResult = sanitizeText(await getChatCompletion(config.system_profile, profileUserPrompt));
+        const profileUserPrompt = interpolate(config.user_profile, {
+            position: cleanLearner.position || 'Data Professional',
+            about: cleanLearner.about ?? '(not provided)',
+            experience: cleanLearner.experience ?? '(not provided)',
+            key_skills: (cleanLearner.key_skills || []).join(', '),
+        });
+        profileResult = sanitizeText(
+            await getChatCompletion(aiConfig, config.system_profile, profileUserPrompt)
+        );
     } catch (err) {
         console.error('Profile analysis error:', err);
         throw err;
@@ -323,7 +318,7 @@ export async function analyzePortfolio(learner: any): Promise<AnalysisResult> {
                 description: p.description ?? p.full_description ?? p.project_full_description ?? '(not provided)',
             });
             const projectResult = sanitizeText(
-                await getChatCompletion(config.system_project, projectUserPrompt)
+                await getChatCompletion(aiConfig, config.system_project, projectUserPrompt)
             );
             // counters are mutated in-place so each flag tracks its own position
             normalizedProjects.push(buildProjectSuggestions(projectResult, i, p, counters));
